@@ -58,11 +58,28 @@ class Router {
             echo "<p><strong>Tipo:</strong> " . gettype($token) . "</p>";
             echo "<p><strong>Comprimento:</strong> " . strlen($token) . "</p>";
             
-            // Testar getEnv
+            // Testar getEnv com debug inline
+            echo "<hr>";
+            echo "<h3>Testando getEnv inline:</h3>";
+            
+            // Simular o que getEnv faz
+            $stmt2 = $db->prepare("SELECT value FROM settings WHERE key = ?");
+            $stmt2->execute(['MERCADO_PAGO_TOKEN']);
+            $result = $stmt2->fetch(PDO::FETCH_COLUMN);
+            
+            echo "<p><strong>Resultado da query:</strong> " . var_export($result, true) . "</p>";
+            echo "<p><strong>Resultado !== false:</strong> " . ($result !== false ? 'SIM' : 'NÃO') . "</p>";
+            echo "<p><strong>Resultado !== null:</strong> " . ($result !== null ? 'SIM' : 'NÃO') . "</p>";
+            echo "<p><strong>Resultado !== '':</strong> " . ($result !== '' ? 'SIM' : 'NÃO') . "</p>";
+            
+            if ($result !== false && $result !== null && $result !== '') {
+                echo "<p><strong>✓ Deveria retornar:</strong> " . substr($result, 0, 20) . '...</p>';
+            } else {
+                echo "<p><strong>✗ Não passou na validação</strong></p>";
+            }
+            
             echo "<hr>";
             echo "<p><strong>getEnv('MERCADO_PAGO_TOKEN'):</strong> " . (getEnv('MERCADO_PAGO_TOKEN') ?: '(vazio)') . "</p>";
-            
-            // Verificar se função getDB está disponível quando getEnv é chamado
             echo "<p><strong>function_exists('getDB'):</strong> " . (function_exists('getDB') ? 'SIM' : 'NÃO') . "</p>";
         };
 
