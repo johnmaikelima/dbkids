@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste de Formulário</title>
+</head>
+<body>
+    <h1>Teste de Formulário Simples</h1>
+    
+    <form method="POST" action="http://localhost:8000/admin/produtos/atualizar" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="1">
+        
+        <label>Nome:</label>
+        <input type="text" name="name" value="Produto Teste"><br><br>
+        
+        <label>Categoria:</label>
+        <input type="text" name="category_id" value="1"><br><br>
+        
+        <label>Descrição:</label>
+        <textarea name="description">Teste</textarea><br><br>
+        
+        <label>Preço:</label>
+        <input type="number" name="price" value="100" step="0.01"><br><br>
+        
+        <label>Estoque:</label>
+        <input type="number" name="stock" value="10"><br><br>
+        
+        <label>Imagem:</label>
+        <input type="file" name="images[]" multiple><br><br>
+        
+        <button type="submit">ENVIAR TESTE</button>
+    </form>
+    
+    <script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        console.log('Formulário sendo enviado...');
+        alert('Formulário vai ser enviado agora!');
+    });
+    </script>
+</body>
+</html>
