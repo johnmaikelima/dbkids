@@ -79,8 +79,52 @@ class Router {
             }
             
             echo "<hr>";
-            echo "<p><strong>getEnv('MERCADO_PAGO_TOKEN'):</strong> " . (getEnv('MERCADO_PAGO_TOKEN') ?: '(vazio)') . "</p>";
+            echo "<h3>Teste direto sem getEnv:</h3>";
+            
+            // Replicar exatamente o código de getEnv aqui
+            $testResult = null;
+            try {
+                if (function_exists('getDB')) {
+                    $dbTest = getDB();
+                    $stmtTest = $dbTest->prepare("SELECT value FROM settings WHERE key = ?");
+                    $stmtTest->execute(['MERCADO_PAGO_TOKEN']);
+                    $testResult = $stmtTest->fetch(PDO::FETCH_COLUMN);
+                    
+                    echo "<p><strong>Resultado do teste inline:</strong> " . ($testResult ?: '(vazio)') . "</p>";
+                    
+                    if ($testResult !== false && $testResult !== null && $testResult !== '') {
+                        echo "<p><strong>✓ Teste inline retornou:</strong> " . substr($testResult, 0, 20) . '...</p>';
+                    }
+                }
+            } catch (Exception $e) {
+                echo "<p><strong>Erro no teste:</strong> " . $e->getMessage() . "</p>";
+            }
+            
+            echo "<hr>";
+            echo "<h3>Teste final - Chamando getEnv:</h3>";
+            
+            $envToken = getEnv('MERCADO_PAGO_TOKEN');
+            echo "<p><strong>getEnv('MERCADO_PAGO_TOKEN'):</strong> " . ($envToken ?: '(vazio)') . "</p>";
+            echo "<p><strong>Tipo retornado:</strong> " . gettype($envToken) . "</p>";
+            echo "<p><strong>Comprimento:</strong> " . strlen($envToken) . "</p>";
+            
+            echo "<hr>";
+            echo "<h3>Teste getSettingValue (NOVA FUNÇÃO):</h3>";
+            
+            $settingToken = getSettingValue('MERCADO_PAGO_TOKEN');
+            echo "<p><strong>getSettingValue('MERCADO_PAGO_TOKEN'):</strong> " . ($settingToken ?: '(vazio)') . "</p>";
+            echo "<p><strong>Tipo retornado:</strong> " . gettype($settingToken) . "</p>";
+            echo "<p><strong>Comprimento:</strong> " . strlen($settingToken) . "</p>";
+            
+            echo "<hr>";
             echo "<p><strong>function_exists('getDB'):</strong> " . (function_exists('getDB') ? 'SIM' : 'NÃO') . "</p>";
+            echo "<p><strong>function_exists('getEnv'):</strong> " . (function_exists('getEnv') ? 'SIM' : 'NÃO') . "</p>";
+            echo "<p><strong>function_exists('getSettingValue'):</strong> " . (function_exists('getSettingValue') ? 'SIM' : 'NÃO') . "</p>";
+            
+            // Teste com Env::get direto
+            echo "<hr>";
+            echo "<h3>Teste Env::get direto:</h3>";
+            echo "<p><strong>Env::get('MERCADO_PAGO_TOKEN'):</strong> " . (Env::get('MERCADO_PAGO_TOKEN') ?: '(vazio)') . "</p>";
         };
 
         // Rota de teste para verificar credenciais do Mercado Pago

@@ -68,24 +68,46 @@ if (!function_exists('getEnv')) {
                 $db = getDB();
                 $stmt = $db->prepare("SELECT value FROM settings WHERE key = ?");
                 $stmt->execute([$key]);
-                $result = $stmt->fetch(\PDO::FETCH_COLUMN);
+                $result = $stmt->fetch(PDO::FETCH_COLUMN);
                 
-                error_log("getEnv({$key}): DB result = " . ($result ?: 'NULL/FALSE'));
-                
-                if ($result !== false && $result !== null && $result !== '') {
-                    error_log("getEnv({$key}): Returning from DB: " . substr($result, 0, 20) . '...');
+                // Se encontrou no banco, retorna o valor
+                if ($result !== false && $result !== null) {
                     return $result;
                 }
             }
-        } catch (\Exception $e) {
-            error_log("getEnv({$key}): Exception: " . $e->getMessage());
+        } catch (Exception $e) {
+            // Se falhar, continua para buscar do .env
         }
         
         // Se não encontrou no banco, busca do .env
-        $envResult = Env::get($key, $default);
-        error_log("getEnv({$key}): Returning from .env: " . ($envResult ?: 'NULL'));
-        return $envResult;
+        $envValue = Env::get($key);
+        if ($envValue !== false && $envValue !== null) {
+            return $envValue;
+        }
+        
+        // Se não encontrou em nenhum lugar, retorna o padrão
+        return $default;
     }
+}
+
+// Função alternativa para obter variáveis do banco (sem cache)
+function getSettingValue($key, $default = null) {
+    try {
+        if (function_exists('getDB')) {
+            $db = getDB();
+            $stmt = $db->prepare("SELECT value FROM settings WHERE key = ?");
+            $stmt->execute([$key]);
+            $result = $stmt->fetch(PDO::FETCH_COLUMN);
+            
+            if ($result !== false && $result !== null) {
+                return $result;
+            }
+        }
+    } catch (Exception $e) {
+        // Falha silenciosa
+    }
+    
+    return $default;
 }
 
 // Carregar .env automaticamente

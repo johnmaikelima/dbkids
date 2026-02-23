@@ -33,7 +33,7 @@ class CheckoutController {
         $data = [
             'cart' => $_SESSION['cart'],
             'total' => $total,
-            'mercadoPagoPublicKey' => getEnv('MERCADO_PAGO_PUBLIC_KEY'),
+            'mercadoPagoPublicKey' => getSettingValue('MERCADO_PAGO_PUBLIC_KEY'),
             'installments' => $installments
         ];
 
@@ -167,7 +167,7 @@ class CheckoutController {
         error_log("Webhook Mercado Pago recebido: " . $input);
 
         // Validar assinatura do Mercado Pago (segurança)
-        $secret = getEnv('MERCADO_PAGO_WEBHOOK_SECRET');
+        $secret = getSettingValue('MERCADO_PAGO_WEBHOOK_SECRET');
         if ($secret) {
             $xSignature = $_SERVER['HTTP_X_SIGNATURE'] ?? '';
             $xRequestId = $_SERVER['HTTP_X_REQUEST_ID'] ?? '';
@@ -222,7 +222,7 @@ class CheckoutController {
 
         try {
             // Buscar informações do pagamento no Mercado Pago
-            $accessToken = getEnv('MERCADO_PAGO_TOKEN');
+            $accessToken = getSettingValue('MERCADO_PAGO_TOKEN');
             
             $ch = curl_init("https://api.mercadopago.com/v1/payments/{$paymentId}");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -369,7 +369,7 @@ class CheckoutController {
 
     private function redirectToMercadoPago($orderId, $total, $customerData, $installments = 1) {
         try {
-            $accessToken = getEnv('MERCADO_PAGO_TOKEN');
+            $accessToken = getSettingValue('MERCADO_PAGO_TOKEN');
             
             error_log("=== MERCADO PAGO DEBUG ===");
             error_log("Token length: " . strlen($accessToken));
@@ -398,20 +398,6 @@ class CheckoutController {
                     'address' => [
                         'street_name' => $customerData['address'],
                         'city_name' => $customerData['city'],
-                        'state_name' => $customerData['state'],
-                        'zip_code' => $customerData['zip_code']
-                    ]
-                ],
-                'back_urls' => [
-                    'success' => getEnv('APP_URL') . '/checkout/sucesso?order_id=' . $orderId,
-                    'failure' => getEnv('APP_URL') . '/checkout/falha',
-                    'pending' => getEnv('APP_URL') . '/checkout/pendente'
-                ],
-                'payment_methods' => [
-                    'excluded_payment_methods' => [],
-                    'excluded_payment_types' => [],
-                    'installments' => (int)$installments
-                ],
                 'external_reference' => (string)$orderId,
                 'auto_return' => 'approved'
             ];
