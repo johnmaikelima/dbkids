@@ -397,7 +397,9 @@ class CheckoutController {
                     ],
                     'address' => [
                         'street_name' => $customerData['address'],
-                        'city_name' => $customerData['city'],
+                        'city_name' => $customerData['city']
+                    ]
+                ],
                 'external_reference' => (string)$orderId,
                 'auto_return' => 'approved'
             ];
