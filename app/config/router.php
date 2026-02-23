@@ -43,6 +43,29 @@ class Router {
             }
         };
 
+        // Rota para debug direto do banco
+        $this->routes['GET']['/debug-db'] = function() {
+            $db = getDB();
+            
+            echo "<h2>Debug Direto do Banco</h2>";
+            
+            // Buscar TOKEN
+            $stmt = $db->prepare("SELECT value FROM settings WHERE key = ?");
+            $stmt->execute(['MERCADO_PAGO_TOKEN']);
+            $token = $stmt->fetch(PDO::FETCH_COLUMN);
+            
+            echo "<p><strong>Query direta TOKEN:</strong> " . ($token ?: '(vazio)') . "</p>";
+            echo "<p><strong>Tipo:</strong> " . gettype($token) . "</p>";
+            echo "<p><strong>Comprimento:</strong> " . strlen($token) . "</p>";
+            
+            // Testar getEnv
+            echo "<hr>";
+            echo "<p><strong>getEnv('MERCADO_PAGO_TOKEN'):</strong> " . (getEnv('MERCADO_PAGO_TOKEN') ?: '(vazio)') . "</p>";
+            
+            // Verificar se função getDB está disponível quando getEnv é chamado
+            echo "<p><strong>function_exists('getDB'):</strong> " . (function_exists('getDB') ? 'SIM' : 'NÃO') . "</p>";
+        };
+
         // Rota de teste para verificar credenciais do Mercado Pago
         $this->routes['GET']['/test-mp-settings'] = function() {
             try {
